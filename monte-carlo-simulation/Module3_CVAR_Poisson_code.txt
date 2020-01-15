@@ -1,0 +1,41 @@
+#Module 3 - CVAR, Poisson distribution 
+
+import numpy as np
+import numpy.random as npr
+from pylab import *
+import matplotlib.pyplot as plt
+
+S0 = 6.86
+r1 = 0.01
+sigma1 = 0.2
+T1 = 1.
+I1 = 400
+ST1 = S0 * np.exp((r1 - 0.5 * sigma1 ** 2) * T1 + sigma1 * np.sqrt(T1) * npr.standard_normal(I1))
+ST1
+
+L1 = 0.5 #fixed (average) loss level 
+p1 = 0.01 #probability of default 
+
+#Generate default scenarios using Poisson distribution 
+
+D = npr.poisson(p1 * T1, I1)
+D = np.where(D > 1, 1, D)
+
+#Risk-neutral value 
+np.exp(-r1 * T1) * 1 / I1 * np.sum(ST1)
+
+CVaR1 = np.exp(-r1 * T1) * 1 / I1 * np.sum(L1 * D * ST1)
+CVaR1
+
+#Present value of the asset adjusted for the credit risk
+S0_CVA1 = np.exp(-r1 * T1) * 1 / I1 * np.sum((1 - L1 * D) * ST1)
+S0_CVA1
+
+#Another way for calculating the present value of the asset
+S0_adj1 = S0 - CVaR1
+S0_adj1
+
+#The number of possible losses
+np.count_nonzero(L1 * D * ST1)
+
+
