@@ -1,5 +1,3 @@
-# European (up-and-out) Option Pricer
-#sdasdsa
 # import library
 import pandas as pd
 import numpy as np
@@ -17,15 +15,15 @@ np.random.seed(0)
 # Option parameters:
 
 S = 100.0   # Initial asset price
-v = 0.3     # Initial volatility
+sigma = 0.3     # Initial volatility
 r = 0.08    # 10 year risk free rate
 T = 1.0     # Years until maturity
 K = 100.0   # Strike price
 B = 150.0   # Barrier price
-N = 12      # Number of discrete time points (by months)
+t = 12      # Number of discrete time points (by months)
 
 # delta T
-delta_t = T/N
+delta_t = T/t
 
 # counterparty firm parameters
 Sf = 200    # Initial asset price
@@ -36,13 +34,19 @@ rr = 0.25   # Recovery rate
 
 # Analytical price
 def analytical_price(S, K, r, v, T):
-    d1 = (log(S/K) + (r*v**2/2)*T)/(v*sqrt(T))
-    d2 = d1 - v * T
+    d1 = (np.log(S/K)+(r+sigma**2/2)*T)/(sigma*np.sqrt(T))
+    d2 = d1 - sigma*np.sqrt(T)
     result = S * stats.norm.cdf(d1) - K * exp(-r*T)*stats.norm.cdf(d2)
     return result
 
 # create European up-and-out option object
-print("Analytical price", analytical_price(S, K, r, v, T))
+print("Analytical price", analytical_price(S, K, r, sigma, T))
+
+#actual zero-coupon bond prices & matirities
+bond_prices = np.array([100,99.38,98.76,98.15,97.54,96.94,96.34,95.74,95.16,
+                       94.57,93.99,93.42,92.85])
+
+maturity = np.array([delta_t * n for n in range(t+1)])
 
 # Analytical bond price Close form solution using Vasicek model
 def A(t1,t2,alpha):
@@ -55,31 +59,34 @@ def D(t1,t2,alpha,b,sigma):
 
 def bond_price_fun(r,t,T,alpha,b,sigma):
     return np.exp(-A(t,T,alpha)*r + D(t,T,alpha,b,sigma))
-
+r0 = 0.05
 def F(x):
-    r0 = x[0]
-    alpha = x[1]
-    b = x[2]
-    sigma = x[3]
-    return np.sum(np.abs(bond_price_fun(r0,0,maturity,alpha,b,sigma) - bond_price))
-
-#actual zero-coupon bond prices & matirities
-zcb_prices = np.array([100,99.38,98.76,98.15,97.54,96.94,96.34,95.74,95.16,
-                       94.57,93.99,93.42,92.85])
-
-maturity = np.array([delta_t * n for n in range(N+1)])
-
+    #r0 = x[0]
+    alpha = x[0]
+    beta = x[1]
+    sigma = x[2]
+    return np.sum(np.abs(bond_price_fun(r0,0,maturity,alpha,beta,sigma) - bond_prices))
 
 # Minimizing F
-bnds = ((0,0.2),(0,5),(0,0.5),(0,2))
+bnds = ((0,0.2),(0,2),(0,0.5),(0,0.2))
+#bnds = ((0,2),(0,0.5),(0,0.2))
 opt_val = scipy.optimize.fmin_slsqp(F,(0.05,0.3,0.05,0.03),bounds=bnds)
-r = opt_val[0]
-opt_alpha = opt_val[1]
+#opt_val = scipy.optimize.fmin_slsqp(F,(0.3,0.05,0.03),bounds=bnds)
+print(opt_val)
+opt_r = opt_val[0]
+opt_alpha = opt_val[0]
 opt_beta = opt_val[2]
-opt_sigma = opt.val[3]
+opt_sigma = opt_val[3]
 
 # Calculating model prices and yield
-model_prices = bond_price_fun(r,0,maturity,opt_alpha,opt_beta,opt_sigma)
+model_prices = bond_price_fun(opt_r,0,maturity,opt_alpha,opt_beta,opt_sigma)
+
+# print the results
+print('\nCalibrated values:')
+print('Interest rate = {}'.format(opt_r))
+print('Alpha = {}'.format(opt_alpha))
+print('Beta = {}'.format(opt_beta))
+print('Volatility = {}'.format(opt_sigma))
 
 # Ploting result
 plt.xlabel("Maturity")
@@ -87,24 +94,24 @@ plt.ylabel("Bond Price")
 plt.plot(maturity, bond_prices)
 plt.plot(maturity, model_prices, 'x')
 
-# define numbers of simulations
-n = 100000
+# Applying the algorithms
+n_simulation = 100000
+n_steps = len(t)
 
-# initialize predictor-corrector Monte Carlo Simulation forward rate
-predcorr_forward = np.ones([n,opt.N])*(opt.model_prices[:-1]-opt.model_prices[1:])/(opt.delta_t*opt.model_prices[1:])
-predcorr_capfac = np.ones([n, opt.N+1])
-delta = np.ones([n, opt.N])*opt.delta_t
+mc_forward = np.one([n_simulation,n_step])*(model_prices[:-1]-model_prices[1:])/(2*vasi_bond[1:])
+predcorr_forward = np.ones([n_simulation,t])*(model_prices[:-1]-model_prices[1:])/(delta_t*model_prices[1:])
+predcorr_capfac = np.ones([n_simulation, t+1])
+mc_capfac = np.ones([n_simulation,n_steps])
 
-#calculate the forward rate for each steps from the bond price
-for i in range(1,opt.N):
-    # generate random numbers follow normal distribution
-    Z = opt.sigma*sqrt(delta[:,i:]*norm.rvs(size = [n,1]))
+delta = np.ones([n_simulation, t])*delta_t
 
-    #predictor-corrector Monte Carlo Simulation
-    mu_initial = np.cumsum(delta[:,i:]*predcorr_forward[:,i:]*opt.sigma**2/(1+delta[:,i:]*predcorr_forward[:,i:]), axis = 1)
-    temp = predcorr_forward[:,i:]*exp((mu_initial-opt.sigma**2/2)*delta[:,i:]+Z)
-    mu_term = np.cumsum(delta[i:]*temp*opt.sigma**2/(1+delta[:,i:]+Z))
-    predcorr_forward[:,i:] = predcorr_forward[:,i:]*exp((mu_initial + mu_term - opt.sigma**2)*delta[:,i:]/2+Z)
+for i in range(1,t):
+    Z = sigma*sqrt(delta[:,i:]*norm.rvs(size = [n_simulation,1]))
+
+    mu_initial = np.cumsum(delta[:,i:]*predcorr_forward[:,i:]*sigma**2/(1+delta[:,i:]*predcorr_forward[:,i:]), axis = 1)
+    for_temp = predcorr_forward[:,i:]*exp((mu_initial-sigma**2/2)*delta[:,i:]+Z)
+    mu_term = np.cumsum(delta[i:]*temp*sigma**2/(1+delta[:,i:]+Z))
+    predcorr_forward[:,i:] = predcorr_forward[:,i:]*exp((mu_initial + mu_term - sigma**2)*delta[:,i:]/2+Z)
 
 # implying capitalization factors from the forward rates
 predcorr_capfac[:,1:] = np.cumprod(1+delta*predcorr_forward,axis = 1)
@@ -115,13 +122,13 @@ predcorr_price = predcorr_capfac**(-1)
 # taking averages: Forward Rate, Bond Price, Capitalization Factors
 
 #mean Forward Rate
-opt.forward_rate = np.mean(predcorr_forward, axis = 0)
+forward_rate = np.mean(predcorr_forward, axis = 0)
 
 #mean Price
 predcorr_price = np.mean(predcorr_price, axis = 0)
 
 # mean Capitalization Factors
-opt.capfac = np.mean(predcorr_capfac, axis = 0)
+capfac = np.mean(predcorr_capfac, axis = 0)
 
 # plot.....
 
@@ -140,7 +147,7 @@ def simulate(Option, n = 10000, gamma = 0.75):
         firm_path = []
         S_j = Option.S_j
         Sf_j = Option.Sf
-        for j in range(Option.N):
+        for j in range(Option.t):
             stock_path.append(S_j)
             firm_path.append(Sf_j)
             xi = np.matmul(corr_matrix, norm.rvs(size = 2))
@@ -150,7 +157,7 @@ def simulate(Option, n = 10000, gamma = 0.75):
             vf_dt = Option.vf*(Sf_j)**(gamma-1)
 
             # continuously compounded interest rate
-            Option.r = log(1 + opt.forward_rate[j]*Option.delta_t)/Option.delta_t
+            Option.r = log(1 + forward_rate[j]*Option.delta_t)/Option.delta_t
 
             #stock price
             S_j *= exp((Option.r-1/2*(vf_dt**2))*Option.delta_t +
@@ -180,13 +187,13 @@ def simulate(Option, n = 10000, gamma = 0.75):
         # use payoff vector and discount factor to compute the price of the option
         Vi = exp(-Option.r * Option.T) * np.array(Option.payoffs, dtype=float)
         Option.call = np.mean(Vi)
-        Option.call_sd = np.std(Vi) / np.sqrt(n*Option.N)
+        Option.call_sd = np.std(Vi) / np.sqrt(n*Option.t)
         
         # estimating CVA
         Option.cva = np.mean(Option.losses)
-        Option.cva_sd = np.std(Option.losses) / np.sqrt(n*Option.N)
+        Option.cva_sd = np.std(Option.losses) / np.sqrt(n*Option.t)
         
 # running simulation
-simulate(opt,n)
+simulate(n)
 print("Done")
 
