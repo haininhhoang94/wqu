@@ -105,7 +105,7 @@ def analytical_price(S, K, r, v, T):
 
 # up & out call price analytical option
 #def new_analytical_price():
-    
+
 # create European up-and-out option object
 print("Analytical price", analytical_price(S, K, r, sigma, T))
 
