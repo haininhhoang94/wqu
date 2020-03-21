@@ -32,7 +32,31 @@ X
 # Using solver method
 
 ##{
-
 X2 = np.linalg.solve(A,B)
 X2
+##}
+
+##{
+from sympy import Eq, Symbol, solve
+
+y = Symbol('y')
+eqn = Eq(y*(8.0 - y**3), 8.0)
+
+solve(eqn)
+##}
+
+##{
+# solve
+#x+y^2 = 4
+#e^x + xy = 3
+
+from scipy.optimize import fsolve
+import math
+
+def equation(p):
+    x, y = p
+    return (x+y**2-4, math.exp(x) + x*y - 3)
+
+x, y = fsolve(equation, (1,1))
+print("{},{}".format(x,y))
 ##}
