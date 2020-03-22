@@ -28,18 +28,19 @@ def spot_to_par(spot_array):
     return result
 
 spot = np.array([0.06,0.07,0.08,0.09,0.1])
-# spot
-# len(spot)
-# spot = np.array([0.09])
 spot_to_par(spot)
-# spot
-# np.zeros(shape=(5))
 ##}
 
 ##{
-import numpy as np
-import pandas as pd
-from scipy.optimize import fsolve
+def equation(x):
+    b = 0
 
+    for j in range(1,3):
+        b = b + x*100 / ((1+spot[j-1])**j)
 
+    b = b + 100 / ((1+spot[4])**3)
+    return (b - 100)
+
+x = fsolve(equation, 0.05)
+x
 ##}
