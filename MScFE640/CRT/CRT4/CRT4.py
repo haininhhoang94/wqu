@@ -13,5 +13,10 @@
 # 7. Write a function that computes active return internally and uses that to compute the mean-adjusted tracking error.
 # 8. Determine which single sector fund best tracks the S&P500.
 
+##{
 import numpy as np
+
+# 1. Download 1-2 years of SPY. Find two other ETF that track it.
+# We will get the SPY, VOO, IVV
+##}
 
