@@ -98,7 +98,51 @@ MATE_voo = mean_adjusted_tracking_error(len(voo),act_ret_voo[~np.isnan(act_ret_v
 MATE_ivv = mean_adjusted_tracking_error(len(ivv),act_ret_ivv[~np.isnan(act_ret_ivv)])
 
 ## Download SPDR funds
+##{
 
+## Load data SPDR
+XLB = pd.read_csv("Data/XLB.csv",
+                    delimiter=',')
+XLB['Date'] = pd.to_datetime(XLB['Date'])
+XLB.set_index('Date', inplace=True)
+
+XLE = pd.read_csv("Data/XLE.csv",
+                    delimiter=',')
+XLE['Date'] = pd.to_datetime(XLE['Date'])
+XLE.set_index('Date', inplace=True)
+
+spy = pd.read_csv("Data/SPY.csv",
+                    delimiter=',')
+spy['Date'] = pd.to_datetime(spy['Date'])
+spy.set_index('Date', inplace=True)
+
+spy = pd.read_csv("Data/SPY.csv",
+                    delimiter=',')
+spy['Date'] = pd.to_datetime(spy['Date'])
+spy.set_index('Date', inplace=True)
+
+spy = pd.read_csv("Data/SPY.csv",
+                    delimiter=',')
+spy['Date'] = pd.to_datetime(spy['Date'])
+spy.set_index('Date', inplace=True)
+
+spy = pd.read_csv("Data/SPY.csv",
+                    delimiter=',')
+spy['Date'] = pd.to_datetime(spy['Date'])
+spy.set_index('Date', inplace=True)
+
+spy = pd.read_csv("Data/SPY.csv",
+                    delimiter=',')
+spy['Date'] = pd.to_datetime(spy['Date'])
+spy.set_index('Date', inplace=True)
+
+spy = pd.read_csv("Data/SPY.csv",
+                    delimiter=',')
+spy['Date'] = pd.to_datetime(spy['Date'])
+spy.set_index('Date', inplace=True)
+
+
+##}
 
 ##}
 
