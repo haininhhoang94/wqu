@@ -15,6 +15,7 @@
 
 ##{
 import numpy as np
+import pandas as numpy
 
 # 1. Download 1-2 years of SPY. Find two other ETF that track it.
 # We will get the SPY, VOO, IVV
