@@ -29,5 +29,5 @@
 # Make sure to use feedback your group received for your previous submission
 
 #%%
-
+# Since the result is based on Submission 1, we will import result from Submission 1
 
