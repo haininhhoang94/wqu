@@ -29,7 +29,7 @@ print(pca.explained_variance_ratio_)
 
 #  Now we will move on to the iris data set
 # Load data
-import load_iris as ld
+from sklearn.datasets import load_iris as ld
 data, classes, labels = ld.load_iris2('./data/iris/iris_train.txt')
 
 #%%
