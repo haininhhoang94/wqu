@@ -17,7 +17,7 @@ import statsmodels.formula.api as smf
 import statsmodels.stats.api as sms
 import statsmodels.api as sm
 import seaborn as sns
-import scipy.stats as st
+from scipy import stats
 
 #%%
 # Import data
@@ -97,19 +97,27 @@ aal['EWMA_25_Price'] = aal['AdjClose'].ewm(com=25).mean()
 # because of corona virus
 # Note that we won't use linear regression in our return
 
-# Case 1: Without breakdown
-y0 = 
-x0 = 
+# Case 1: with breakdown in 1-Feb-2020
+y1 = aal[aal['Date_'] < '2020-02-01']['AdjClose']
+x1 = np.array(aal[aal['Date_'] < '2020-02-01'].index)
+y2 = aal[aal['Date_'] >='2020-02-01']['AdjClose']
+x2 = np.array(aal[aal['Date_'] >= '2020-02-01'].index)
 
-# Case 2: with breakdown
-y1 = aal[aal['Date_'] < '2019-02-01']['AdjClose']
-x1 = np.array(aal[aal['Date_'] < '2019-02-01'].index)
-#  x1 = aal[aal['Date_'] < '2020-02-01']['Date_']
-y2 = aal[aal['Date_'] >='2019-02-01']['AdjClose']
-x2 = np.array(aal[aal['Date_'] >= '2019-02-01'].index)
-#  x2 = aal[aal['Date_'] >='2020-02-01']['Date_']
-
+f_test = chow_test.f_value(y1, x1, y2, x2)
+p_val = chow_test.p_value(y1, x1, y2, x2)
+print(f_test)
+print(p_val)
+# => p-value = 9.681119063302348e-18 < 0.0005
+# Structural break at Feb 2020 
+# fit with 12/13 Feb 2020? Korean outbreak
 #%%
+
+# Case 2: with breakdown in 13-Feb-2020
+y1 = aal[aal['Date_'] < '2020-02-13']['AdjClose']
+x1 = np.array(aal[aal['Date_'] < '2020-02-13'].index)
+y2 = aal[aal['Date_'] >='2020-02-13']['AdjClose']
+x2 = np.array(aal[aal['Date_'] >= '2020-02-13'].index)
+
 f_test = chow_test.f_value(y1, x1, y2, x2)
 p_val = chow_test.p_value(y1, x1, y2, x2)
 print(f_test)
@@ -117,12 +125,22 @@ print(p_val)
 
 #%%
 # Bera-Jarque
-#  X = aal['Day']
-#  y = aal['AdjClose']
-
-#  olsr_results = smf.ols(y,X).fit()
-#  print(olsr_results.summary())
-st.jarque_bera(aal['Log_Return'])
-
+stats.jarque_bera(np.array(aal['AdjClose']))
+#%%
+from scipy import stats
+import numpy as np
+np.random.seed(987654321)
+x = np.random.normal(0, 1, 100000)
+y = np.random.rayleigh(1, 100000)
+#%%
+stats.jarque_bera(x)
+#%%
+plt.figure(figsize=(12,7))
+ax = sns.distplot(aal['Log_Return'])
+plt.show()
+#%%
+#%%
+#%%
+#%%
 #%%
 #%%
