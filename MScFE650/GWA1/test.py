@@ -1,25 +1,31 @@
+
 #%%
-import os
-os.getcwd()
+import sys
+sys.path.append('/home/haininhhoang94/Projects/wqu/MScFE650/GWA1/')
 #%%
-import pandas as pd
 import numpy as np
-import chow_test
+import pandas as pd
+import scipy.stats as stats
+import matplotlib.pyplot as plt
+import datetime
+import statsmodels.formula.api as smf
+import statsmodels.stats.api as sms
+import statsmodels.api as sm
+import seaborn as sns
+from scipy import stats
+
 #%%
-data = pd.read_csv('/home/haininhhoang94/Projects/wqu/MScFE650/GWA1/Chow_test_example/chow_test/financial_time_series.csv')
-data.head()
+# Import data
+aal = pd.read_csv("~/Projects/wqu/MScFE650/GWA1/RawData/AAL.csv", delimiter=',')
+aal['Date'] = pd.to_datetime(aal['Date'], format="%d/%m/%Y")
+aal['Date_'] = aal['Date']
+#  aal.set_index('Date', inplace=True)
+
 #%%
-y1 = data[data['Year'] < 1980]['LogEqPrem']
-x1 = data[data['Year'] < 1980]['BookMarket']
-y2 = data[data['Year'] >= 1980]['LogEqPrem']
-x2 = data[data['Year'] >= 1980]['BookMarket']
-#%%
-f_test = chow_test.f_value(y1, x1, y2, x2)
-print(f_test)
-#%%
-p_val = chow_test.p_value(y1, x1, y2, x2)
-print(p_val)
-#%%
-#%%
-#%%
-#%%
+sns.set_style('darkgrid')
+sns.lineplot(x='Date_', y='AdjClose', data=aal)
+plt.xticks(rotation=30)
+plt.show()
+#  aal['AdjClose'].plot(figsize=(16/12))
+
+

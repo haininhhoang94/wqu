@@ -4,6 +4,7 @@
 #%%
 import sys
 sys.path.append('/home/haininhhoang94/Projects/wqu/MScFE650/GWA1/')
+
 #%%
 import chow_test
 
@@ -139,6 +140,7 @@ plt.figure(figsize=(12,7))
 ax = sns.distplot(aal['Log_Return'])
 plt.show()
 #%%
+
 #%%
 #%%
 #%%
