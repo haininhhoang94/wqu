@@ -96,14 +96,25 @@ plt.show()
 # 6. Plot using plt.imshow(new_image)
 # 
 # ### Solution:
-
 # %%
 # Format data
 m, n = im.shape[:2]
-data = im.reshape(m*n, 3)
+data = im.reshape(m*n, 4)
 data = np.array(data, dtype = float)
 
 # Your code here
+k_means = KMeans(n_clusters=3).fit(data)
+new_image = k_means.predict(data)
+centers = k_means.cluster_centers_
+labels = k_means.labels_
+# %%
+new_img = k_means.cluster_centers_[k_means.labels_]
+new_img = np.reshape(new_img, (im.shape))
+plt.imshow(new_img)
+# %%
+new_image = new_image.reshape(m, n, 3)
+new_image = np.asarray(new_image, dtype="uint8")
+plt.imshow(new_image)
 
 # %% [markdown]
 # You need about ____ colours to replicate the image
