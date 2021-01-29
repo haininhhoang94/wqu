@@ -7,6 +7,5 @@ from Ipython.display import Image
 from Ipython.display import HTML
 from skimage import io
 
-ic = 
-
-
+import seaborn as sb
+import pandas as pd

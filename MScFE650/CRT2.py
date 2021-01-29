@@ -5,6 +5,8 @@
 
 import numpy as np
 import pandas as pd
+import pandas as pd
+
 def haha(haha):
     """TODO: Docstring for haha.
 
@@ -12,7 +14,7 @@ def haha(haha):
     :returns: TODO
 
     """
-    return ()
+    pass
 
 import pandas as pd
 def (arg1):
